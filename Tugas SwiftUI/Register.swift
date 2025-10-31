@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct RegisterView: View {
   @State var nama = "" //nyambung ke binding
   @State var password = "" //nyambung ke binding
   var body: some View {
@@ -21,20 +21,12 @@ struct ContentView: View {
             .background(.gray.opacity(0.3))
             .cornerRadius(20)
             
-          HStack{
-            Spacer()
-            Text ("Kamu lupa Password?")
-              .foregroundStyle(.red)
-              .fontWeight(.bold)
-          }
           
-          NavigationLink {
-            NewsView()
-          } label: {
-            
+          
+          NavigationLink(destination: HomeView()) {
             HStack {
-              
-              Text ("Login")
+
+              Text ("Daftar Dulu")
               Image(systemName: "person.crop.circle.fill")
             }
             
@@ -52,12 +44,12 @@ struct ContentView: View {
         .padding(.horizontal)
         .padding(.vertical)
       }
-      .navigationTitle("Login Disini")
+      .navigationTitle("Daftar Dulu guis")
       
     }
   }
 }
 
 #Preview {
-  ContentView()
+  RegisterView()
 }

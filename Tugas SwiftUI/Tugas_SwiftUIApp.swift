@@ -11,7 +11,7 @@ import SwiftUI
 struct Tugas_SwiftUIApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
     }
 }
