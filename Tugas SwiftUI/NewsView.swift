@@ -1,60 +1,140 @@
-//
-//  NewsView.swift
-//  Tugas SwiftUI
-//
-//  Created by iCodeWave Community on 31/10/25.
-//
-
 import SwiftUI
-import SafariServices
+import SwiftyJSON
+import Combine
+
+class ContentViewModel: ObservableObject {
+  @Published var articles: [NewsArticle] = []
+  @Published var isLoading: Bool = false
+  @Published var errorMessage: String?
+  
+  private var network = Networking()
+  
+  func loadArticles(query: String? = nil) {
+    isLoading = true
+    errorMessage = nil
+    
+    network.fetchData(query: query) { [weak self] hasil in
+      DispatchQueue.main.async {
+        self?.isLoading = false
+        if hasil.isEmpty {
+          self?.errorMessage = "Tidak ada berita ditemukan."
+        } else {
+          self?.articles = hasil
+        }
+      }
+    }
+  }
+}
 
 struct NewsView: View {
-  
-  @StateObject private var network = PengelolaBerita()
-  @State private var selectedURL: URL?
-  @State private var isShowingSafari = false
-  
+  @State var item: NewsArticle?
+  @StateObject private var vm = ContentViewModel()
+  @State private var searchText = ""
   
   var body: some View {
     NavigationStack {
-      List {
-        ForEach(network.dataYangDiambil, id: \.self) { article in
-          Text(article.title)
-            .onTapGesture {
-              if let url = URL(string: article.url) {
-                selectedURL = url
-                isShowingSafari = true
+      Group {
+        if let article = item { // Detail Berita
+          ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+              AsyncImage(url: imageURL(from: article)) { phase in
+                switch phase {
+                case .empty:
+                  ProgressView().frame(height: 250)
+                case .success(let image):
+                  image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .cornerRadius(12)
+                case .failure:
+                  Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 250)
+                    .foregroundStyle(.secondary)
+                @unknown default:
+                  EmptyView()
+                }
+              }
+              
+              Text(article.title)
+                .font(.title3)
+                .bold()
+                .padding(.top, 8)
+              
+              if !article.description.isEmpty {
+                Text(article.description)
+                  .font(.body)
+                  .foregroundStyle(.secondary)
               }
             }
+            .padding()
+          }
+          
+        } else { // List Berita
+          if vm.isLoading {
+            ProgressView("Memuat berita...")
+          } else if let error = vm.errorMessage {
+            VStack(spacing: 12) {
+              Text("Terjadi kesalahan:")
+              Text(error)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+              Button("Coba Lagi") {
+                vm.loadArticles()
+              }
+            }
+            .padding()
+          } else {
+            List(vm.articles) { article in
+              NavigationLink {
+                NewsView(item: article)
+              } label: {
+                VStack(alignment: .leading, spacing: 6) {
+                  Text(article.title)
+                    .font(.headline)
+                    .lineLimit(2)
+                  if !article.description.isEmpty {
+                    Text(article.description)
+                      .font(.subheadline)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(2)
+                  }
+                }
+                .padding(.vertical, 4)
+              }
+            }
+            .listStyle(.plain)
+          }
         }
+      }
+      .navigationTitle(item == nil ? "Berita" : "Detail Berita")
+      .searchable(text: $searchText, prompt: "Cari berita...")
+      .onSubmit(of: .search) {
+        vm.loadArticles(query: searchText)
       }
       .onAppear {
-        Task {
-          await network.ambilBerita(query: "BAHLIL")
-        }
+          if item == nil && vm.articles.isEmpty {
+              print("🟢 Memuat berita...")
+              vm.loadArticles()
+          }
       }
-      .navigationTitle("Berita Hot")
-    }
-    .sheet(isPresented: $isShowingSafari) {
-      if let url = selectedURL {
-        SafariView(url: url)
-      }
+
     }
   }
-}
-
-struct SafariView: UIViewControllerRepresentable {
-  let url: URL
   
-  func makeUIViewController(context: Context) -> SFSafariViewController {
-    SFSafariViewController(url: url)
+  private func imageURL(from article: NewsArticle) -> URL? {
+    if let urlString = article.urlToImage,
+       !urlString.isEmpty,
+       let url = URL(string: urlString) {
+      return url
+    }
+    return nil
   }
-  
-  func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
-
-
 
 #Preview {
   NewsView()
 }
+

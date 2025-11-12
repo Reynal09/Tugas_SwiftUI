@@ -1,63 +1,92 @@
 import SwiftUI
+import FirebaseAuth
+import Combine
 
-struct ContentView: View {
-  @State var nama = "" //nyambung ke binding
-  @State var password = "" //nyambung ke binding
-  var body: some View {
-    NavigationStack {
 
-      ScrollView{
-          
-        VStack {
-          
-          TextField("Masukkan nama", text: $nama)
-            .padding()
-            .background(.gray.opacity(0.3))
-            .cornerRadius(20)
-          
-          
-          SecureField("Masukkan password", text: $password)
-            .padding()
-            .background(.gray.opacity(0.3))
-            .cornerRadius(20)
-            
-          HStack{
-            Spacer()
-            Text ("Kamu lupa Password?")
-              .foregroundStyle(.red)
-              .fontWeight(.bold)
-          }
-          
-          NavigationLink {
-            NewsView()
-          } label: {
-            
-            HStack {
-              
-              Text ("Login")
-              Image(systemName: "person.crop.circle.fill")
-            }
-            
-            .padding(.vertical,5)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical,8)
-            .foregroundStyle(.white)
-            .background(.blue)
-            .cornerRadius(100)
-            .padding(.vertical,20)
-            
-          }
-          
+class LoginViewModel: ObservableObject {
+  @Published var email = ""
+  @Published var password = ""
+  @Published var isLoading = false
+  @Published var isShowSuccess = false
+  @Published var isShowFailed = false
+  @Published var isLoggedIn = false
+  
+  func login() {
+    isLoading = true
+    Task {
+      do {
+        // 🔹 Gunakan signIn, bukan createUser (karena login, bukan daftar)
+        let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        print("SUKSES LOGIN! User ID:", result.user.uid)
+        await MainActor.run {
+          self.isShowSuccess = true
+          self.isLoggedIn = true
+          self.isLoading = false
         }
-        .padding(.horizontal)
-        .padding(.vertical)
+      } catch {
+        print("Email/Password salah:", error.localizedDescription)
+        await MainActor.run {
+          self.isShowFailed = true
+          self.isLoading = false
+        }
       }
-      .navigationTitle("Login Disini")
-      
     }
   }
 }
 
+// MARK: - ContentView (Login Page)
+struct ContentView: View {
+  @StateObject var vm = LoginViewModel()
+  
+  var body: some View {
+    NavigationStack {
+      VStack(spacing: 20) {
+        Text("Login Akun")
+          .font(.largeTitle)
+          .bold()
+        
+        TextField("Email", text: $vm.email)
+          .textFieldStyle(RoundedBorderTextFieldStyle())
+          .keyboardType(.emailAddress)
+          .autocapitalization(.none)
+        
+        SecureField("Password", text: $vm.password)
+          .textFieldStyle(RoundedBorderTextFieldStyle())
+        
+        Button {
+          vm.login()
+        } label: {
+          HStack {
+            if vm.isLoading {
+              ProgressView()
+            }
+            Text(vm.isLoading ? "Sedang Masuk..." : "Login")
+              .bold()
+          }
+          .frame(maxWidth: .infinity)
+          .padding()
+          .background(Color.blue)
+          .foregroundColor(.white)
+          .cornerRadius(10)
+        }
+        .disabled(vm.isLoading)
+        
+        Spacer()
+      }
+      .padding()
+      .alert("Gagal", isPresented: $vm.isShowFailed) {
+        Button("Tutup", role: .cancel) {}
+      } message: {
+        Text("Email atau password salah.")
+      }
+      
+      // 🔹 Navigation otomatis ke NewsView setelah login sukses
+      .navigationDestination(isPresented: $vm.isLoggedIn) {
+        NewsView()
+      }
+    }
+  }
+}
 #Preview {
   ContentView()
 }

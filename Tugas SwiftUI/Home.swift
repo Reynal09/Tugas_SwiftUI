@@ -62,7 +62,7 @@ struct HomeView: View {
         }
         .padding(.horizontal)
       }
-      .navigationTitle("Login Disini")
+      .navigationTitle("Home")
       
     }
   }

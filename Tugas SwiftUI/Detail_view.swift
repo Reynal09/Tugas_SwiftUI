@@ -11,5 +11,5 @@ struct DetailView: View {
 }
 
 #Preview {
-  DetailView(nama: .constant("Alfi"),password: .constant(""))
+  DetailView(nama: .constant(""),password: .constant(""))
 }

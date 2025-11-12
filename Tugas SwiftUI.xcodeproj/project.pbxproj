@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		566074F22EC322CF00C51093 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 566074F12EC322CF00C51093 /* FirebaseCore */; };
+		566074F42EC322D800C51093 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 566074F32EC322D800C51093 /* FirebaseAuth */; };
+		566074F62EC322F200C51093 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 566074F52EC322F200C51093 /* FirebaseFirestore */; };
 		5684B6A22EB457C3006E332E /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 5684B6A12EB457C3006E332E /* Alamofire */; };
 		5684B6A52EB4580C006E332E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 5684B6A42EB4580C006E332E /* SwiftyJSON */; };
 /* End PBXBuildFile section */
@@ -29,17 +32,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				5684B6A52EB4580C006E332E /* SwiftyJSON in Frameworks */,
+				566074F22EC322CF00C51093 /* FirebaseCore in Frameworks */,
 				5684B6A22EB457C3006E332E /* Alamofire in Frameworks */,
+				566074F62EC322F200C51093 /* FirebaseFirestore in Frameworks */,
+				566074F42EC322D800C51093 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		566074F02EC322CF00C51093 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		56D1C67D2EB3320700A1BF3D = {
 			isa = PBXGroup;
 			children = (
 				56D1C6882EB3320800A1BF3D /* Tugas SwiftUI */,
+				566074F02EC322CF00C51093 /* Frameworks */,
 				56D1C6872EB3320800A1BF3D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,6 +88,9 @@
 			packageProductDependencies = (
 				5684B6A12EB457C3006E332E /* Alamofire */,
 				5684B6A42EB4580C006E332E /* SwiftyJSON */,
+				566074F12EC322CF00C51093 /* FirebaseCore */,
+				566074F32EC322D800C51093 /* FirebaseAuth */,
+				566074F52EC322F200C51093 /* FirebaseFirestore */,
 			);
 			productName = "Tugas SwiftUI";
 			productReference = 56D1C6862EB3320800A1BF3D /* Tugas SwiftUI.app */;
@@ -87,7 +104,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					56D1C6852EB3320700A1BF3D = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -106,6 +123,7 @@
 			packageReferences = (
 				5684B6A02EB457C3006E332E /* XCRemoteSwiftPackageReference "Alamofire" */,
 				5684B6A32EB4580C006E332E /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				56AA2E822EC3059200158C39 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 56D1C6872EB3320800A1BF3D /* Products */;
@@ -197,6 +215,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -254,6 +273,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -363,9 +383,32 @@
 				minimumVersion = 5.0.2;
 			};
 		};
+		56AA2E822EC3059200158C39 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		566074F12EC322CF00C51093 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56AA2E822EC3059200158C39 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		566074F32EC322D800C51093 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56AA2E822EC3059200158C39 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		566074F52EC322F200C51093 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56AA2E822EC3059200158C39 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
 		5684B6A12EB457C3006E332E /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5684B6A02EB457C3006E332E /* XCRemoteSwiftPackageReference "Alamofire" */;

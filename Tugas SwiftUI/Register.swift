@@ -1,51 +1,63 @@
 import SwiftUI
+import Combine
+
+class RegisterViewModel: ObservableObject {
+  @Published var email = ""
+  @Published var password = ""
+  @Published var isRegistering = false
+  @Published var isShowSucses = false
+  @Published var isShowFailed = false
+  func register() {
+    Task { // async - await
+      do { // try - throws
+        let hasil = try await AuthenticationManager.shared.createUser(email: self.email, password: self.password)
+        print("SUKSES BUAT AKUN!")
+        isShowSucses = true
+        isRegistering = false
+      } catch {
+        print("GAGAL BUAT AKUN:", error)
+        isShowFailed = true
+        isRegistering = false
+      }
+    }
+  }
+}
 
 struct RegisterView: View {
-  @State var nama = "" //nyambung ke binding
-  @State var password = "" //nyambung ke binding
+  @Environment(\.dismiss) var dismiss
+  @StateObject var vm = RegisterViewModel()
   var body: some View {
     NavigationStack {
-
-      ScrollView{
-          
-        VStack {
-          
-          TextField("Masukkan nama", text: $nama)
-            .padding()
-            .background(.gray.opacity(0.3))
-            .cornerRadius(20)
-          
-          
-          SecureField("Masukkan password", text: $password)
-            .padding()
-            .background(.gray.opacity(0.3))
-            .cornerRadius(20)
-            
-          
-          
-          NavigationLink(destination: HomeView()) {
-            HStack {
-
-              Text ("Daftar Dulu")
-              Image(systemName: "person.crop.circle.fill")
+      List {
+        TextField("Email", text: $vm.email)
+        SecureField("Password", text: $vm.password)
+        Button {
+          vm.register()
+          vm.isRegistering = true
+        } label: {
+          HStack {
+            if vm.isRegistering { // true
+              ProgressView()
             }
-            
-            .padding(.vertical,5)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical,8)
-            .foregroundStyle(.white)
-            .background(.blue)
-            .cornerRadius(100)
-            .padding(.vertical,20)
-            
+            Text("Daftar Akun")
           }
-          
         }
-        .padding(.horizontal)
-        .padding(.vertical)
+        .disabled(vm.isRegistering)
+        
       }
-      .navigationTitle("Daftar Dulu guis")
+      .alert("Sukses", isPresented: $vm.isShowSucses, actions: {
+        Button("Yeayy!!!") {
+          dismiss()}
+      }, message: {
+        Text("Akunmu berhasil dibuat")
+      })
       
+      .alert("Gagal", isPresented: $vm.isShowFailed, actions: {
+        Button("YAHHH!!"){}
+      }, message: {
+        Text("Gagal kimak")
+      })
+      .navigationTitle("Registrasi Akun")
     }
   }
 }
@@ -53,3 +65,4 @@ struct RegisterView: View {
 #Preview {
   RegisterView()
 }
+
